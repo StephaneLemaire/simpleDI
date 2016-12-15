@@ -2,7 +2,6 @@ package com.dplm.simpleDI;
 
 import java.lang.reflect.Constructor;
 import java.util.HashMap;
-import java.util.HashSet;
 
 import com.dplm.simpleDI.exceptions.CircularDependencyException;
 import com.dplm.simpleDI.exceptions.EmptyConstructorNotFoundException;
@@ -25,35 +24,35 @@ public class Injector {
 			singleton = new Injector();
 		}
 		
-		return (T)singleton.checkCacheOrInject(classObj, new HashSet<Class<?>>());
+		return (T)singleton.checkCacheOrInject(classObj, null, new HashMap<Class<?>, Class<?>>());
 	}
 	
-	private Object checkCacheOrInject(Class<?> classObj, HashSet<Class<?>> processingStack){
+	private Object checkCacheOrInject(Class<?> classObj, Class<?> parentClassObj, HashMap<Class<?>, Class<?>> dependencyMap){
 		if(instanceMap.containsKey(classObj)){
 			return instanceMap.get(classObj);
 		}
 		
-		circularDependencyChecking(classObj, processingStack);
+		circularDependencyChecking(classObj, parentClassObj, dependencyMap);
 		
-		Object result = resolveInjection(classObj, processingStack);
+		Object result = resolveInjection(classObj, dependencyMap);
 		instanceMap.put(classObj, result);
 		return result;
 	}
 
-	private void circularDependencyChecking(Class<?> classObj, HashSet<Class<?>> processingStack){
-		if(processingStack.contains(classObj)){
+	private void circularDependencyChecking(Class<?> classObj, Class<?> parentClassObj, HashMap<Class<?>, Class<?>> dependencyMap){
+		if(dependencyMap.containsKey(classObj)){
 			throw new CircularDependencyException();
 		}else{
-			processingStack.add(classObj);
-		}		
+			dependencyMap.put(classObj, parentClassObj);
+		}
 	}
 	
-	private Object resolveInjection(Class<?> classObj, HashSet<Class<?>> processingStack){
+	private Object resolveInjection(Class<?> classObj, HashMap<Class<?>, Class<?>> dependencyMap){
 		Constructor<?> constructor = findConstructor(classObj);
 		if(constructor.getParameterCount() == 0){
 			return resolveEmptyConstructor(constructor);
 		}else{
-			return resolveInjectedConstructor(constructor, processingStack);
+			return resolveInjectedConstructor(constructor, dependencyMap);
 		}
 	}
 		
@@ -82,8 +81,8 @@ public class Injector {
 		}
 	}
 	
-	private Object resolveInjectedConstructor(Constructor<?> constructor, HashSet<Class<?>> processingStack){
-		Object[] params = buildConstructorParameter(constructor, processingStack);
+	private Object resolveInjectedConstructor(Constructor<?> constructor, HashMap<Class<?>, Class<?>> dependencyMap){
+		Object[] params = buildConstructorParameter(constructor, dependencyMap);
 		
 		try {
 			return constructor.newInstance(params);
@@ -92,11 +91,11 @@ public class Injector {
 		}
 	}
 	
-	private Object[] buildConstructorParameter(Constructor<?> constructor, HashSet<Class<?>> processingStack){
+	private Object[] buildConstructorParameter(Constructor<?> constructor, HashMap<Class<?>, Class<?>> dependencyMap){
 		Object[] params = new Object[constructor.getParameterCount()];
 		int id = 0;
 		for(Class<?> classObj : constructor.getParameterTypes()){
-			params[id++] = checkCacheOrInject(classObj, processingStack);
+			params[id++] = checkCacheOrInject(classObj, constructor.getDeclaringClass(), dependencyMap);
 		}
 		
 		return params;
