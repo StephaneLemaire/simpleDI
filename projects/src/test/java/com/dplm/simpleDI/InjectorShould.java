@@ -5,6 +5,8 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
+import com.dplm.simpleDI.InterfaceObject.InterfaceObject;
+import com.dplm.simpleDI.InterfaceObject.InterfaceWithoutDefaultInjection;
 import com.dplm.simpleDI.basicObject.BasicObject;
 import com.dplm.simpleDI.basicObject.BasicObjectWithConstructorError;
 import com.dplm.simpleDI.basicObject.BasicObjectWithSelfDependency;
@@ -12,6 +14,7 @@ import com.dplm.simpleDI.basicObject.BasicObjectWithoutEmptyConstructor;
 import com.dplm.simpleDI.dependency.FirstCircularObject;
 import com.dplm.simpleDI.exceptions.CircularDependencyException;
 import com.dplm.simpleDI.exceptions.EmptyConstructorNotFoundException;
+import com.dplm.simpleDI.exceptions.MissingDefaultInjectionException;
 import com.dplm.simpleDI.exceptions.UnexpectedInstantiationException;
 import com.dplm.simpleDI.parentObject.ParentObject;
 import com.dplm.simpleDI.parentObject.ParentObjectWithCircularDepencency;
@@ -83,4 +86,22 @@ public class InjectorShould {
 		thrown.expect(CircularDependencyException.class);
 		Injector.inject(BasicObjectWithSelfDependency.class);		
 	}
+	
+	@Test
+	public void throw_onInject_whenInterfaceWithoutDefaultInjection(){
+		thrown.expect(MissingDefaultInjectionException.class);
+		Injector.inject(InterfaceWithoutDefaultInjection.class);
+	}
+
+	@Test
+	public void throw_onInject_whenInterfaceWithoutDefaultInjectionImplementation(){
+		thrown.expect(MissingDefaultInjectionException.class);
+		Injector.inject(InterfaceWithoutDefaultInjection.class);
+	}
+	
+	@Test
+	public void inject_onInject_whenAnnotatedInterfaceProvided(){
+		InterfaceObject interfaceObject = Injector.inject(InterfaceObject.class);
+		Assert.assertEquals(42, interfaceObject.get42());
+	}	
 }
