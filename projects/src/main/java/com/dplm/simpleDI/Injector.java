@@ -67,7 +67,7 @@ public class Injector {
 	
 	private Object resolveObject(Class<?> classObj, HashMap<Class<?>, Class<?>> dependencyMap){
 		Constructor<?> constructor = findConstructor(classObj);
-		if(constructor.getParameterCount() == 0){
+		if(getContructorParameterCount(constructor) == 0){
 			return resolveEmptyConstructor(constructor);
 		}else{
 			return resolveInjectedConstructor(constructor, dependencyMap);
@@ -79,7 +79,7 @@ public class Injector {
 		for(Constructor<?> constructor : classObj.getConstructors()){
 			if(constructor.isAnnotationPresent(AutoInject.class)){
 				return constructor;
-			}else if(constructor.getParameterCount() == 0){
+			}else if(getContructorParameterCount(constructor) == 0){
 				emptyConstructor = constructor;
 			}
 		}
@@ -110,12 +110,16 @@ public class Injector {
 	}
 	
 	private Object[] buildConstructorParameter(Constructor<?> constructor, HashMap<Class<?>, Class<?>> dependencyMap){
-		Object[] params = new Object[constructor.getParameterCount()];
+		Object[] params = new Object[getContructorParameterCount(constructor)];
 		int id = 0;
 		for(Class<?> classObj : constructor.getParameterTypes()){
 			params[id++] = checkCacheOrInject(classObj, constructor.getDeclaringClass(), dependencyMap);
 		}
 		
 		return params;
+	}
+	
+	private int getContructorParameterCount(Constructor<?> constructor){
+		return constructor.getParameterTypes().length;
 	}
 }

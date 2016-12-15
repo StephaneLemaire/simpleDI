@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.dplm.simpleDI</groupId>
   <artifactId>SimpleDI</artifactId>
-  <version>1.7.2</version>
+  <version>1.7.3</version>
   <name>SimpleDI</name>
   <description>A really simple Dependency Injection mechanism</description>
 
