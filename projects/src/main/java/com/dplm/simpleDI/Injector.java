@@ -40,9 +40,9 @@ public class Injector {
 		Constructor<?> constructor = findConstructor(classObj);
 		if(constructor.getParameterCount() == 0){
 			return resolveEmptyConstructor(constructor);
+		}else{
+			return resolveInjectedConstructor(constructor);
 		}
-		
-		return null;
 	}
 		
 	private Constructor<?> findConstructor(Class<?> classObj){
@@ -68,5 +68,25 @@ public class Injector {
 		} catch (Exception e) {
 			throw new UnexpectedInstantiationException();
 		}
+	}
+	
+	private Object resolveInjectedConstructor(Constructor<?> constructor){
+		Object[] params = buildConstructorParameter(constructor);
+		
+		try {
+			return constructor.newInstance(params);
+		} catch (Exception e) {
+			throw new UnexpectedInstantiationException();
+		}
+	}
+	
+	private Object[] buildConstructorParameter(Constructor<?> constructor){
+		Object[] params = new Object[constructor.getParameterCount()];
+		int id = 0;
+		for(Class<?> classObj : constructor.getParameterTypes()){
+			params[id++] = checkCacheOrInject(classObj);
+		}
+		
+		return params;
 	}
 }

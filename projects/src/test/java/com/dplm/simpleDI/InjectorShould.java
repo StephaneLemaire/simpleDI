@@ -37,4 +37,22 @@ public class InjectorShould {
 		BasicObject sameBasicObject = Injector.inject(BasicObject.class);
 		Assert.assertEquals(basicObject, sameBasicObject);
 	}
+	
+	@Test
+	public void inject_onInject_whenObjectSpecifyAutoInjection(){
+		ParentObject parentObject = Injector.inject(ParentObject.class);
+		Assert.assertEquals(42, parentObject.get42());
+	}
+	
+	@Test
+	public void throw_onInject_whenInjectedInstantiationFails(){
+		thrown.expect(UnexpectedInstantiationException.class);
+		Injector.inject(ParentObjectWithDependencyConstructorError.class);
+	}
+	
+	@Test
+	public void throw_onInject_whenParentObjectInstantiationFails(){
+		thrown.expect(UnexpectedInstantiationException.class);
+		Injector.inject(ParentObjectWithConstructorError.class);
+	}	
 }
