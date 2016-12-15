@@ -31,23 +31,35 @@ public class Injector {
 			return instanceMap.get(classObj);
 		}
 		
-		Object result = resolveObjectWithEmptyConstructor(classObj);
+		Object result = resolveInjection(classObj);
 		instanceMap.put(classObj, result);
 		return result;
 	}
 	
-	private Object resolveObjectWithEmptyConstructor(Class<?> classObj){
-		Constructor<?> emptyConstructor = findEmptyConstructor(classObj);
-		return resolveEmptyConstructor(emptyConstructor);
+	private Object resolveInjection(Class<?> classObj){
+		Constructor<?> constructor = findConstructor(classObj);
+		if(constructor.getParameterCount() == 0){
+			return resolveEmptyConstructor(constructor);
+		}
+		
+		return null;
 	}
-	
-	private Constructor<?> findEmptyConstructor(Class<?> classObj){
+		
+	private Constructor<?> findConstructor(Class<?> classObj){
+		Constructor<?> emptyConstructor = null;
 		for(Constructor<?> constructor : classObj.getConstructors()){
-			if(constructor.getParameterCount() == 0){
+			if(constructor.isAnnotationPresent(AutoInject.class)){
 				return constructor;
+			}else if(constructor.getParameterCount() == 0){
+				emptyConstructor = constructor;
 			}
 		}
-		throw new EmptyConstructorNotFoundException();
+		
+		if(emptyConstructor == null){
+			throw new EmptyConstructorNotFoundException();			
+		}else{
+			return emptyConstructor;
+		}
 	}	
 	
 	private Object resolveEmptyConstructor(Constructor<?> constructor){
