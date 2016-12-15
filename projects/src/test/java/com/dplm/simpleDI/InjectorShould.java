@@ -69,4 +69,10 @@ public class InjectorShould {
 		thrown.expect(CircularDependencyException.class);
 		Injector.inject(FirstCircularObject.class);
 	}
+	
+	@Test
+	public void throw_onInject_whenObjectDependingOnItself(){
+		thrown.expect(CircularDependencyException.class);
+		Injector.inject(BasicObjectWithSelfDependency.class);		
+	}
 }
