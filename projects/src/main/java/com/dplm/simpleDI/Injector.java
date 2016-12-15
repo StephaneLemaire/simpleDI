@@ -6,7 +6,6 @@ import java.util.HashMap;
 import com.dplm.simpleDI.exceptions.CircularDependencyException;
 import com.dplm.simpleDI.exceptions.EmptyConstructorNotFoundException;
 import com.dplm.simpleDI.exceptions.MissingDefaultInjectionException;
-import com.dplm.simpleDI.exceptions.MissingInjectionImplementationException;
 import com.dplm.simpleDI.exceptions.UnexpectedInstantiationException;
 
 public class Injector {
@@ -63,12 +62,7 @@ public class Injector {
 		}
 		
 		DefaultInject annotation = classObj.getAnnotation(DefaultInject.class);
-		Class<?> implementation = annotation.implementation();
-		if(implementation == null){
-			throw new MissingInjectionImplementationException();
-		}else{
-			return checkCacheOrInject(implementation, classObj, dependencyMap);
-		}
+		return checkCacheOrInject(annotation.implementation(), classObj, dependencyMap);
 	}	
 	
 	private Object resolveObject(Class<?> classObj, HashMap<Class<?>, Class<?>> dependencyMap){
