@@ -30,4 +30,11 @@ public class InjectorShould {
 		thrown.expect(UnexpectedInstantiationException.class);
 		Injector.inject(BasicObjectWithConstructorError.class);
 	}
+	
+	@Test
+	public void useCache_onInject_whenObjectCalledMoreThanOnce(){
+		BasicObject basicObject = Injector.inject(BasicObject.class);
+		BasicObject sameBasicObject = Injector.inject(BasicObject.class);
+		Assert.assertEquals(basicObject, sameBasicObject);
+	}
 }
