@@ -59,4 +59,4 @@ public static int main(String[] args){
 ```
 
 ## That's it ?
-Yup ! The idea of the project is to use Dependency Injection usage easy. Any idea to make it even simpler ? Contribute !
+Yup ! The idea of the project is to use Dependency Injection easily. Any idea to make it even simpler ? Contribute !
