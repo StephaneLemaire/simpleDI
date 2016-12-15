@@ -9,29 +9,30 @@ When you'll be ready, ask the framework to generate the object you want and magi
 
 Exemple by the code:
 
-// First object
-class BasicObject{
-  public int get42(){
-    return 42;
-  }
-}
+```javascript
+// First object  
+class BasicObject{  
+  public int get42(){  
+    return 42;  
+  }  
+}  
 
-// Parent object with a dependency on the BasicObject
-class ParentObject{
-  private BasicObject basicObject;
+// Parent object with a dependency on the BasicObject  
+class ParentObject{  
+  private BasicObject basicObject;  
   
-  @AutoInject
-  public ParentObject(BasicObject basicObject){
-    this.basicObject = basicObject;
-  }
+  @AutoInject  
+  public ParentObject(BasicObject basicObject){  
+    this.basicObject = basicObject;  
+  }  
   
-  public int get42(){
-    return basicObject;
-  }
-}
+  public int get42(){  
+    return basicObject;  
+  }  
+}  
 
-public static int main(String[] args){
-  ParentObject parentObject = Injector.inject(ParentObject.class);
-  System.out.println(parentObject.get42());
-}
-
+public static int main(String[] args){  
+  ParentObject parentObject = Injector.inject(ParentObject.class);  
+  System.out.println(parentObject.get42());  
+}  
+```
