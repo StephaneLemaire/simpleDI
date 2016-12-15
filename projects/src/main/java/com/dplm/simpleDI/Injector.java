@@ -41,7 +41,7 @@ public class Injector {
 
 	private void circularDependencyChecking(Class<?> classObj, Class<?> parentClassObj, HashMap<Class<?>, Class<?>> dependencyMap){
 		if(dependencyMap.containsKey(classObj)){
-			throw new CircularDependencyException();
+			throw new CircularDependencyException(classObj, parentClassObj, dependencyMap);
 		}else{
 			dependencyMap.put(classObj, parentClassObj);
 		}
