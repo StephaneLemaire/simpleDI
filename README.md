@@ -27,7 +27,7 @@ class ParentObject{
   }  
   
   public int get42(){  
-    return basicObject;  
+    return 42;  
   }  
 }  
 
@@ -48,7 +48,7 @@ class InterfaceObject{
 
 class BasicObject implements InterfaceObject{  
   public int get42(){  
-    return basicObject;  
+    return 42;  
   }  
 }  
 
