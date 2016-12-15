@@ -62,7 +62,7 @@ public class Injector {
 		}
 		
 		DefaultInject annotation = classObj.getAnnotation(DefaultInject.class);
-		return checkCacheOrInject(annotation.implementation(), classObj, dependencyMap);
+		return checkCacheOrInject(annotation.implementedBy(), classObj, dependencyMap);
 	}	
 	
 	private Object resolveObject(Class<?> classObj, HashMap<Class<?>, Class<?>> dependencyMap){
