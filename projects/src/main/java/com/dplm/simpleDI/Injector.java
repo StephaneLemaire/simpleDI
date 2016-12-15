@@ -2,7 +2,9 @@ package com.dplm.simpleDI;
 
 import java.lang.reflect.Constructor;
 import java.util.HashMap;
+import java.util.HashSet;
 
+import com.dplm.simpleDI.exceptions.CircularDependencyException;
 import com.dplm.simpleDI.exceptions.EmptyConstructorNotFoundException;
 import com.dplm.simpleDI.exceptions.UnexpectedInstantiationException;
 
@@ -23,25 +25,35 @@ public class Injector {
 			singleton = new Injector();
 		}
 		
-		return (T)singleton.checkCacheOrInject(classObj);
+		return (T)singleton.checkCacheOrInject(classObj, new HashSet<Class<?>>());
 	}
 	
-	private Object checkCacheOrInject(Class<?> classObj){
+	private Object checkCacheOrInject(Class<?> classObj, HashSet<Class<?>> processingStack){
 		if(instanceMap.containsKey(classObj)){
 			return instanceMap.get(classObj);
 		}
 		
-		Object result = resolveInjection(classObj);
+		circularDependencyChecking(classObj, processingStack);
+		
+		Object result = resolveInjection(classObj, processingStack);
 		instanceMap.put(classObj, result);
 		return result;
 	}
+
+	private void circularDependencyChecking(Class<?> classObj, HashSet<Class<?>> processingStack){
+		if(processingStack.contains(classObj)){
+			throw new CircularDependencyException();
+		}else{
+			processingStack.add(classObj);
+		}		
+	}
 	
-	private Object resolveInjection(Class<?> classObj){
+	private Object resolveInjection(Class<?> classObj, HashSet<Class<?>> processingStack){
 		Constructor<?> constructor = findConstructor(classObj);
 		if(constructor.getParameterCount() == 0){
 			return resolveEmptyConstructor(constructor);
 		}else{
-			return resolveInjectedConstructor(constructor);
+			return resolveInjectedConstructor(constructor, processingStack);
 		}
 	}
 		
@@ -70,8 +82,8 @@ public class Injector {
 		}
 	}
 	
-	private Object resolveInjectedConstructor(Constructor<?> constructor){
-		Object[] params = buildConstructorParameter(constructor);
+	private Object resolveInjectedConstructor(Constructor<?> constructor, HashSet<Class<?>> processingStack){
+		Object[] params = buildConstructorParameter(constructor, processingStack);
 		
 		try {
 			return constructor.newInstance(params);
@@ -80,11 +92,11 @@ public class Injector {
 		}
 	}
 	
-	private Object[] buildConstructorParameter(Constructor<?> constructor){
+	private Object[] buildConstructorParameter(Constructor<?> constructor, HashSet<Class<?>> processingStack){
 		Object[] params = new Object[constructor.getParameterCount()];
 		int id = 0;
 		for(Class<?> classObj : constructor.getParameterTypes()){
-			params[id++] = checkCacheOrInject(classObj);
+			params[id++] = checkCacheOrInject(classObj, processingStack);
 		}
 		
 		return params;

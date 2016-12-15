@@ -5,6 +5,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
+import com.dplm.simpleDI.exceptions.CircularDependencyException;
 import com.dplm.simpleDI.exceptions.EmptyConstructorNotFoundException;
 import com.dplm.simpleDI.exceptions.UnexpectedInstantiationException;
 
@@ -55,4 +56,10 @@ public class InjectorShould {
 		thrown.expect(UnexpectedInstantiationException.class);
 		Injector.inject(ParentObjectWithConstructorError.class);
 	}	
+	
+	@Test
+	public void throw_onInject_whenCircularDependencyDetected(){
+		thrown.expect(CircularDependencyException.class);
+		Injector.inject(ParentObjectWithCircularDepencency.class);
+	}
 }
