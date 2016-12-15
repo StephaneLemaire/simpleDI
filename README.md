@@ -27,7 +27,7 @@ class ParentObject{
   }  
   
   public int get42(){  
-    return 42;  
+    return basicObject.get42();  
   }  
 }  
 
