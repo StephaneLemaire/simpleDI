@@ -1,7 +1,7 @@
 # simpleDI
 A really simple Dependency Injection mechanism in Java.
 
-The project has been started initially when after trying to integrate DI framework on Android. Why making the developper's life so difficult just for a graph resolution problem ?
+The project has been started initially after trying to integrate DI framework on Android. Why making the developper's life so difficult  ? Let's solve this !
 
 ## Simplest way to use it
 The project allows developpers to inject dependencies directly in their class constructors. Add `@AutoInject` before your constructor to tell the framework this constructor contains class/interface to inject.
