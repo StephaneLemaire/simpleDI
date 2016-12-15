@@ -5,6 +5,8 @@ import java.util.HashMap;
 
 import com.dplm.simpleDI.exceptions.CircularDependencyException;
 import com.dplm.simpleDI.exceptions.EmptyConstructorNotFoundException;
+import com.dplm.simpleDI.exceptions.MissingDefaultInjectionException;
+import com.dplm.simpleDI.exceptions.MissingInjectionImplementationException;
 import com.dplm.simpleDI.exceptions.UnexpectedInstantiationException;
 
 public class Injector {
@@ -48,6 +50,28 @@ public class Injector {
 	}
 	
 	private Object resolveInjection(Class<?> classObj, HashMap<Class<?>, Class<?>> dependencyMap){
+		if(classObj.isInterface()){
+			return resolveInterface(classObj, dependencyMap);
+		}else{
+			return resolveObject(classObj, dependencyMap);
+		}
+	}
+		
+	private Object resolveInterface(Class<?> classObj, HashMap<Class<?>, Class<?>> dependencyMap){
+		if(classObj.isAnnotationPresent(DefaultInject.class) == false){
+			throw new MissingDefaultInjectionException();
+		}
+		
+		DefaultInject annotation = classObj.getAnnotation(DefaultInject.class);
+		Class<?> implementation = annotation.implementation();
+		if(implementation == null){
+			throw new MissingInjectionImplementationException();
+		}else{
+			return checkCacheOrInject(implementation, classObj, dependencyMap);
+		}
+	}	
+	
+	private Object resolveObject(Class<?> classObj, HashMap<Class<?>, Class<?>> dependencyMap){
 		Constructor<?> constructor = findConstructor(classObj);
 		if(constructor.getParameterCount() == 0){
 			return resolveEmptyConstructor(constructor);
@@ -55,7 +79,7 @@ public class Injector {
 			return resolveInjectedConstructor(constructor, dependencyMap);
 		}
 	}
-		
+	
 	private Constructor<?> findConstructor(Class<?> classObj){
 		Constructor<?> emptyConstructor = null;
 		for(Constructor<?> constructor : classObj.getConstructors()){
