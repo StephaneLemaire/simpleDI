@@ -12,7 +12,7 @@ public class CircularDependencyException extends RuntimeException{
 		while(parentObj != null){
 			sb.append(" <- ");
 			sb.append(parentObj.getName());
-			parentObj = dependencyMap.get(classObj);
+			parentObj = dependencyMap.get(parentObj);
 		}
 		System.out.println(sb.toString());
 	}
