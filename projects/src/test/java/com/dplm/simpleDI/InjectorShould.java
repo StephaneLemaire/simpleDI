@@ -5,10 +5,18 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
+import com.dplm.simpleDI.basicObject.BasicObject;
+import com.dplm.simpleDI.basicObject.BasicObjectWithConstructorError;
+import com.dplm.simpleDI.basicObject.BasicObjectWithSelfDependency;
+import com.dplm.simpleDI.basicObject.BasicObjectWithoutEmptyConstructor;
 import com.dplm.simpleDI.dependency.FirstCircularObject;
 import com.dplm.simpleDI.exceptions.CircularDependencyException;
 import com.dplm.simpleDI.exceptions.EmptyConstructorNotFoundException;
 import com.dplm.simpleDI.exceptions.UnexpectedInstantiationException;
+import com.dplm.simpleDI.parentObject.ParentObject;
+import com.dplm.simpleDI.parentObject.ParentObjectWithCircularDepencency;
+import com.dplm.simpleDI.parentObject.ParentObjectWithConstructorError;
+import com.dplm.simpleDI.parentObject.ParentObjectWithDependencyConstructorError;
 
 public class InjectorShould {
 

@@ -1,4 +1,4 @@
-package com.dplm.simpleDI;
+package com.dplm.simpleDI.basicObject;
 
 public class BasicObject {
 
