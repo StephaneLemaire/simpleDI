@@ -60,33 +60,3 @@ public static int main(String[] args){
 
 ## That's it ?
 Yup ! The idea of the project is to use Dependency Injection easily. Any idea to make it even simpler ? Contribute !
-
-## And Maven/Gradle ?
-Yes of course !
-
-### Maven :
-```
-	<repository>  
-		<id>StephaneLemaireRepo</id>  
-		<url>http://files.dp-lm.com/</url>  
-	</repository>  
-
-	<dependency>  
-		<groupId>com.dplm.simpleDI</groupId>  
-		<artifactId>SimpleDI</artifactId>  
-		<version>1.7.3</version>  
-	</dependency>  
-```
-
-### Gradle :
-```
-	repositories {
-		maven {
-			url "http://files.dp-lm.com/maven2"
-		}
-	}
-
-	dependencies {
-		compile group: 'com.dplm.simpleDI', name: 'SimpleDI', version: '1.7.3'
-	}
-```
