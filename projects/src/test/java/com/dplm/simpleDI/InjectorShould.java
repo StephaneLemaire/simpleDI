@@ -6,14 +6,17 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
 import com.dplm.simpleDI.InterfaceObject.InterfaceObject;
+import com.dplm.simpleDI.InterfaceObject.InterfaceWithWrongImplementation;
 import com.dplm.simpleDI.InterfaceObject.InterfaceWithoutDefaultInjection;
 import com.dplm.simpleDI.basicObject.BasicObject;
 import com.dplm.simpleDI.basicObject.BasicObjectWithConstructorError;
 import com.dplm.simpleDI.basicObject.BasicObjectWithSelfDependency;
 import com.dplm.simpleDI.basicObject.BasicObjectWithoutEmptyConstructor;
+import com.dplm.simpleDI.basicObject.ImplementationOfInterfaceWithoutDefaultInjection;
 import com.dplm.simpleDI.dependency.FirstCircularObject;
 import com.dplm.simpleDI.exceptions.CircularDependencyException;
 import com.dplm.simpleDI.exceptions.EmptyConstructorNotFoundException;
+import com.dplm.simpleDI.exceptions.InterfaceImplementationNotFoundException;
 import com.dplm.simpleDI.exceptions.MissingDefaultInjectionException;
 import com.dplm.simpleDI.exceptions.UnexpectedInstantiationException;
 import com.dplm.simpleDI.parentObject.ParentObject;
@@ -104,4 +107,23 @@ public class InjectorShould {
 		InterfaceObject interfaceObject = Injector.inject(InterfaceObject.class);
 		Assert.assertEquals(42, interfaceObject.get42());
 	}	
+	
+	@Test
+	public void throw_onInject_whenInterfaceImplementationMissing(){
+		thrown.expect(InterfaceImplementationNotFoundException.class);
+		Injector.inject(InterfaceWithWrongImplementation.class);
+	}
+	
+	@Test
+	public void inject_onInject_whenInterfaceImplementationExplicit(){
+		Injector.addImplementation(InterfaceWithoutDefaultInjection.class, ImplementationOfInterfaceWithoutDefaultInjection.class);
+		InterfaceWithoutDefaultInjection object = Injector.inject(InterfaceWithoutDefaultInjection.class);
+		Assert.assertEquals(42, object.get42());
+	}
+	
+	@Test
+	public void throw_onInject_whenAddingIncompatibleInterfaceAndImplementation(){
+		thrown.expect(InterfaceImplementationNotFoundException.class);
+		Injector.addImplementation(InterfaceWithoutDefaultInjection.class, BasicObject.class);
+	}
 }

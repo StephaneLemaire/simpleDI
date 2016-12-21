@@ -5,6 +5,7 @@ import java.util.HashMap;
 
 import com.dplm.simpleDI.exceptions.CircularDependencyException;
 import com.dplm.simpleDI.exceptions.EmptyConstructorNotFoundException;
+import com.dplm.simpleDI.exceptions.InterfaceImplementationNotFoundException;
 import com.dplm.simpleDI.exceptions.MissingDefaultInjectionException;
 import com.dplm.simpleDI.exceptions.UnexpectedInstantiationException;
 
@@ -13,21 +14,37 @@ public class Injector {
 	private static Injector singleton;	
 
 	private HashMap<Class<?>, Object> instanceMap;
+	private HashMap<Class<?>, Class<?>> additionnalInterfaceMap;
 	
 	public Injector(){
 		instanceMap = new HashMap<Class<?>, Object>();
+		additionnalInterfaceMap = new HashMap<Class<?>, Class<?>>();
 	}
 	
 	@SuppressWarnings("unchecked")
 	public static <T> T inject(Class<T> classObj){
-		
+		Injector injector = getSingleton();
+		return (T)injector.checkCacheOrInject(classObj, null, new HashMap<Class<?>, Class<?>>());
+	}
+	
+	public static void addImplementation(Class<?> interfaceObj, Class<?> classObj){
+		Injector injector = getSingleton();
+		injector.addAdditionnalInterfaceImplementation(interfaceObj, classObj);
+	}
+
+	private static Injector getSingleton(){
 		if(singleton == null){
 			singleton = new Injector();
 		}
-		
-		return (T)singleton.checkCacheOrInject(classObj, null, new HashMap<Class<?>, Class<?>>());
+		return singleton;
 	}
 	
+	private void addAdditionnalInterfaceImplementation(Class<?> interfaceObj, Class<?> classObj){
+		checkClassIsImplementingInterface(classObj, interfaceObj);
+		
+		additionnalInterfaceMap.put(interfaceObj, classObj);
+	}
+		
 	private Object checkCacheOrInject(Class<?> classObj, Class<?> parentClassObj, HashMap<Class<?>, Class<?>> dependencyMap){
 		if(instanceMap.containsKey(classObj)){
 			return instanceMap.get(classObj);
@@ -56,14 +73,35 @@ public class Injector {
 		}
 	}
 		
-	private Object resolveInterface(Class<?> classObj, HashMap<Class<?>, Class<?>> dependencyMap){
-		if(classObj.isAnnotationPresent(DefaultInject.class) == false){
-			throw new MissingDefaultInjectionException();
+	private Object resolveInterface(Class<?> itfObj, HashMap<Class<?>, Class<?>> dependencyMap){
+		Class<?> classObj = null;
+		if(itfObj.isAnnotationPresent(DefaultInject.class)){
+			DefaultInject annotation = itfObj.getAnnotation(DefaultInject.class);	
+			classObj = annotation.implementedBy();
+		}else if(additionnalInterfaceMap.containsKey(itfObj)){
+			classObj = additionnalInterfaceMap.get(itfObj);
+		}else{
+			throw new MissingDefaultInjectionException();			
+		}
+			
+		return resolveInterfaceImplementation(itfObj, classObj, dependencyMap);
+	}	
+	
+	private Object resolveInterfaceImplementation(Class<?> itfObj, Class<?> classObj, HashMap<Class<?>, Class<?>> dependencyMap){
+		checkClassIsImplementingInterface(classObj, itfObj);
+		return checkCacheOrInject(classObj, itfObj, dependencyMap);
+		
+	}
+	
+	private void checkClassIsImplementingInterface(Class<?> impl, Class<?> itf){
+		for(Class<?> implItf : impl.getInterfaces()){
+			if(implItf == itf){
+				return;
+			}
 		}
 		
-		DefaultInject annotation = classObj.getAnnotation(DefaultInject.class);
-		return checkCacheOrInject(annotation.implementedBy(), classObj, dependencyMap);
-	}	
+		throw new InterfaceImplementationNotFoundException(itf, impl);
+	}
 	
 	private Object resolveObject(Class<?> classObj, HashMap<Class<?>, Class<?>> dependencyMap){
 		Constructor<?> constructor = findConstructor(classObj);
