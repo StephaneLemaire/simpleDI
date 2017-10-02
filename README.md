@@ -1,3 +1,5 @@
+https://travis-ci.org/StephaneLemaire/simpleDI.svg?branch=master
+
 # simpleDI
 A really simple Dependency Injection mechanism in Java.
 
