@@ -1,6 +1,4 @@
-https://travis-ci.org/StephaneLemaire/simpleDI.svg?branch=master
-
-# simpleDI
+# simpleDI ![alt text](https://travis-ci.org/StephaneLemaire/simpleDI.svg?branch=master)
 A really simple Dependency Injection mechanism in Java.
 
 The project has been started initially after trying to integrate DI framework on Android. Why making the developper's life so difficult  ? Let's solve this !
