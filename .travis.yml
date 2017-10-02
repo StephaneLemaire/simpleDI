@@ -1,0 +1,2 @@
+before_script: cd projects
+language: java
